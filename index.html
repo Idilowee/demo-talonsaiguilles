@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Talons Aiguilles — EDHEC Roubaix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red:   #8C1721;
+      --black: #0F0F0F;
+      --white: #FAFAFA;
+      --nav-h: 72px;
+      --c: 'Barlow Condensed', sans-serif;
+      --s: 'Barlow', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--s); background: var(--white); color: var(--black); overflow-x: hidden; }
+
+    /* ── Curtain ────────────────────── */
+    #curtain { position: fixed; inset: 0; background: var(--black); z-index: 500; transform: translateY(100%); pointer-events: none; }
+    #curtain.down { animation: cDown .45s cubic-bezier(.76,0,.24,1) forwards; }
+    #curtain.up   { animation: cUp   .45s cubic-bezier(.76,0,.24,1) forwards; }
+    @keyframes cDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+    @keyframes cUp   { from { transform: translateY(0);     } to { transform: translateY(100%); } }
+
+    /* ── Nav ────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h);
+      background: var(--white); border-bottom: 1px solid #E0DDD8;
+      z-index: 100; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 48px;
+    }
+    .nav-logo { font-family: var(--c); font-weight: 900; font-size: 16px; letter-spacing: .08em; text-transform: uppercase; color: var(--black); cursor: pointer; }
+    .nav-links { display: flex; gap: 36px; list-style: none; align-items: center; }
+    .nav-links .nav-brand-logo { display: flex; align-items: center; }
+    .nav-links .nav-brand-logo img { height: 28px; display: block; }
+    .nav-links a {
+      font-family: var(--c); font-size: 11px; font-weight: 700;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: rgba(15,15,15,.5); text-decoration: none; cursor: pointer;
+      position: relative; padding-bottom: 4px; transition: color .2s;
+    }
+    .nav-links a::after { content: ''; position: absolute; bottom: 0; left: 0; height: 1px; width: 0; background: var(--red); transition: width .3s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--black); }
+    .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+    .nav-ta { cursor: pointer; display: flex; align-items: center; }
+    .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .nav-hamburger span { display: block; width: 22px; height: 1.5px; background: var(--black); transition: all .3s; }
+
+    /* ── Pages ──────────────────────── */
+    .page { display: none; padding-top: var(--nav-h); }
+    .page.active { display: block; }
+
+    /* ── Reveal ─────────────────────── */
+    .reveal { opacity: 0; transform: translateY(44px); transition: opacity .75s ease, transform .75s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .rd1 { transition-delay: .1s; } .rd2 { transition-delay: .2s; } .rd3 { transition-delay: .3s; }
+
+    /* ── Buttons ────────────────────── */
+    .btn { display: inline-block; font-family: var(--c); font-weight: 700; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; padding: 13px 28px; border: 1px solid var(--black); background: transparent; color: var(--black); cursor: pointer; text-decoration: none; transition: background .25s, color .25s; }
+    .btn:hover { background: var(--black); color: var(--white); }
+    .btn-red { background: var(--red); border-color: var(--red); color: var(--white); }
+    .btn-red:hover { background: transparent; border-color: var(--red); color: var(--red); }
+    .btn-outline-w { border-color: rgba(250,250,250,.25); color: rgba(250,250,250,.7); background: transparent; }
+    .btn-outline-w:hover { background: transparent; border-color: var(--red); color: var(--red); }
+
+    /* ══ HOME ═══════════════════════════════════════ */
+
+    /* Hero */
+    .hero { background: var(--black); min-height: calc(100vh - var(--nav-h)); display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; position: sticky; top: var(--nav-h); z-index: 0; }
+    .hero-left { padding: 80px 48px 80px 64px; display: flex; flex-direction: column; justify-content: flex-end; }
+    .hero-eyebrow {
+      font-family: var(--c); font-size: 10px; font-weight: 700;
+      letter-spacing: .22em; text-transform: uppercase; color: var(--red);
+      display: flex; align-items: center; gap: 10px; margin-bottom: 28px;
+      opacity: 0; animation: fadeIn .6s ease .3s forwards;
+    }
+    .hero-eyebrow::before { content: ''; display: block; width: 20px; height: 1px; background: var(--red); }
+    .hero-title {
+      font-family: var(--c); font-weight: 800;
+      font-size: clamp(4.5rem, 7.5vw, 9rem);
+      text-transform: uppercase; line-height: .9;
+      color: var(--white); margin-bottom: 36px;
+    }
+    .hero-title .ww { overflow: hidden; display: block; }
+    .hero-title .w { display: block; transform: translateY(110%); animation: wordUp .9s cubic-bezier(.16,1,.3,1) forwards; }
+    .hero-title .w.red { color: var(--red); }
+    .hero-title .ww:nth-child(1) .w { animation-delay: .1s; }
+    .hero-title .ww:nth-child(2) .w { animation-delay: .22s; }
+    .hero-title .ww:nth-child(3) .w { animation-delay: .34s; }
+    @keyframes wordUp { from { transform: translateY(110%); } to { transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .hero-sub { font-size: 14px; font-weight: 300; color: rgba(250,250,250,.38); line-height: 1.75; max-width: 360px; margin-bottom: 44px; opacity: 0; animation: fadeIn .8s ease .7s forwards; }
+    .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; opacity: 0; animation: fadeIn .8s ease .9s forwards; }
+
+    /* Hero image */
+    .hero-right { position: relative; overflow: hidden; }
+    .hero-img {
+      position: absolute; inset: 0;
+      background: #1a1a1a center/cover no-repeat;
+      transition: transform .1s linear;
+    }
+    .hero-img-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #1a1a1a; }
+    .hero-img-ph::after { content: 'PHOTO DÉFILÉ'; font-family: var(--c); font-size: 12px; letter-spacing: .18em; color: rgba(255,255,255,.07); text-transform: uppercase; }
+
+    /* Stats */
+    .stats { background: var(--black); border-top: 1px solid rgba(255,255,255,.05); display: grid; grid-template-columns: repeat(4,1fr); }
+    .stat { padding: 24px 36px; border-right: 1px solid rgba(255,255,255,.05); }
+    .stat:last-child { border-right: none; }
+    .stat-n { font-family: var(--c); font-weight: 800; font-size: 2rem; color: var(--white); line-height: 1; margin-bottom: 3px; }
+    .stat-n em { color: var(--red); font-style: normal; font-size: 1.3rem; }
+    .stat-l { font-family: var(--c); font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: rgba(250,250,250,.28); }
+
+    /* Qui sommes-nous (home section) */
+    .who { padding: 80px 64px 0; background: var(--white); position: relative; z-index: 1; }
+    .who-title { font-family: var(--c); font-weight: 800; font-size: clamp(3rem, 6vw, 5.5rem); text-transform: uppercase; line-height: .9; color: var(--black); margin-bottom: 48px; }
+    .who-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 4px; grid-template-rows: 1fr; }
+    .who-text p { font-size: 14px; font-weight: 300; color: #444; line-height: 1.85; margin-bottom: 16px; }
+    .who-text a { color: var(--red); text-decoration: none; }
+    .who-left { display: flex; flex-direction: column; align-items: flex-start; }
+    .who-left p { font-size: 14px; font-weight: 300; color: #444; line-height: 1.85; margin-bottom: 24px; }
+    .who-right-photo { background: #1c1c1c; min-height: 500px; }
+    .who-photo-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    .who-photo-ph::after { content: attr(data-label); font-family: var(--c); font-size: 11px; letter-spacing: .14em; color: rgba(255,255,255,.07); text-transform: uppercase; }
+
+    /* Events grid */
+    .events-section { padding: 80px 64px; background: var(--white); position: relative; z-index: 1; }
+    .section-label { font-family: var(--c); font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
+    .section-title { font-family: var(--c); font-weight: 800; font-size: clamp(2rem,4vw,3.2rem); text-transform: uppercase; line-height: .95; color: var(--black); margin-bottom: 28px; }
+    .section-title.light { color: var(--white); }
+    .ev-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 4px; }
+    .ev-card { position: relative; overflow: hidden; cursor: pointer; }
+    .ev-card-inner { background: var(--black); width: 100%; min-height: 220px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; transition: transform .5s cubic-bezier(.16,1,.3,1); }
+    .ev-card:hover .ev-card-inner { transform: scale(1.015); }
+    .ev-card::after { content: ''; position: absolute; inset: 0; background: var(--red); opacity: 0; transition: opacity .4s; pointer-events: none; }
+    .ev-card:hover::after { opacity: .1; }
+    .ev-card-main { height: 100%; display: flex; flex-direction: column; }
+    .ev-card-main .ev-card-inner { flex: 1; min-height: 280px; }
+    .ev-label { font-family: var(--c); font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--red); }
+    .ev-name { font-family: var(--c); font-weight: 800; font-size: 1.7rem; text-transform: uppercase; color: var(--white); line-height: 1; }
+    .ev-sm .ev-name { font-size: 1.3rem; }
+    .ev-date { font-size: 11px; color: rgba(250,250,250,.3); font-weight: 300; margin-top: 6px; }
+    .ev-side { display: grid; grid-template-rows: 1fr 1fr; gap: 4px; }
+
+    /* Actualités */
+    .news-section { padding: 80px 64px; background: var(--white); position: relative; z-index: 1; }
+    .news-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 4px; }
+    .news-card { position: relative; overflow: hidden; cursor: pointer; }
+    .news-card::after { content: ''; position: absolute; inset: 0; background: var(--red); opacity: 0; transition: opacity .4s; pointer-events: none; }
+    .news-card:hover::after { opacity: .1; }
+    .news-grid > .news-card:first-child { height: 100%; display: flex; flex-direction: column; }
+    .news-grid > .news-card:first-child .news-card-inner { flex: 1; }
+    .news-card-inner { background: var(--black); min-height: 280px; padding: 24px; display: flex; flex-direction: column; justify-content: flex-end; position: relative; transition: transform .5s cubic-bezier(.16,1,.3,1); }
+    .news-card:hover .news-card-inner { transform: scale(1.01); }
+    .news-side { display: grid; grid-template-rows: 1fr 1fr; gap: 4px; }
+    .news-sm .news-card-inner { min-height: 180px; }
+    .news-tag { font-family: var(--c); font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
+    .news-title { font-family: var(--c); font-weight: 800; font-size: 1.5rem; text-transform: uppercase; color: var(--white); line-height: 1.05; }
+    .news-sm .news-title { font-size: 1.1rem; }
+    .news-sub { font-size: 12px; color: rgba(250,250,250,.35); margin-top: 6px; font-weight: 300; }
+
+    /* Footer / CTA */
+    .footer-cta { background: var(--black); padding: 64px; display: grid; grid-template-columns: auto 1fr auto; gap: 48px; align-items: center; border-top: 1px solid rgba(255,255,255,.05); position: relative; z-index: 1; }
+    .footer-logo { height: 100px; width: auto; object-fit: contain; }
+    .footer-cta-text h2 { font-family: var(--c); font-weight: 800; font-size: clamp(2rem,3vw,2.8rem); text-transform: uppercase; color: var(--white); line-height: .95; }
+    .footer-cta-text p { font-size: 13px; font-weight: 300; color: rgba(250,250,250,.35); margin-top: 8px; }
+    .footer-cta-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+    .footer-bottom { background: #080808; padding: 40px 64px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; position: relative; z-index: 1; }
+    .footer-brand p { font-family: var(--c); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: rgba(250,250,250,.25); margin-bottom: 4px; }
+    .footer-brand span { font-size: 11px; font-weight: 300; color: rgba(250,250,250,.15); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-family: var(--c); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(250,250,250,.2); text-decoration: none; transition: color .2s; }
+    .footer-links a:hover { color: var(--red); }
+
+    /* ══ ASSOCIATION ═══════════════════════════════════════ */
+
+    .page-hero-white { background: var(--white); padding: 80px 64px 56px; }
+    .page-hero-white h1 { font-family: var(--c); font-weight: 800; font-size: clamp(3.5rem, 7vw, 7rem); text-transform: uppercase; line-height: .88; color: var(--black); }
+    .page-hero-white h1 em { color: var(--red); font-style: normal; }
+
+    /* Key numbers dark */
+    .numbers-dark { background: var(--black); padding: 80px 64px; }
+    .numbers-dark .sub { font-family: var(--c); font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: rgba(250,250,250,.35); margin-bottom: 16px; }
+    .numbers-dark h2 { font-family: var(--c); font-weight: 800; font-size: clamp(3.5rem, 7vw, 7rem); text-transform: uppercase; line-height: .88; color: var(--white); margin-bottom: 64px; }
+    .numbers-dark h2 em { color: var(--red); font-style: normal; }
+    .numbers-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; }
+    .number-item { }
+    .number-val { font-family: var(--c); font-weight: 800; font-size: clamp(4rem, 7vw, 7rem); color: var(--red); line-height: .9; margin-bottom: 8px; }
+    .number-label { font-family: var(--c); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(250,250,250,.35); }
+
+    /* Events list (association page) */
+    .ev-list { background: var(--black); padding: 0 64px 80px; }
+    .ev-list-title { font-family: var(--c); font-weight: 800; font-size: clamp(2rem,4vw,3.2rem); text-transform: uppercase; color: var(--white); margin-bottom: 40px; }
+    .ev-list-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+    .ev-list-item { position: relative; padding: 40px; cursor: pointer; overflow: hidden; background-size: cover; background-position: center; }
+    .ev-list-item::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,.78); transition: background .5s ease; }
+    .ev-list-item:hover::before { background: rgba(0,0,0,.32); }
+    .ev-list-item > * { position: relative; z-index: 1; }
+    .ev-list-item:hover .ev-list-num,
+    .ev-list-item:hover .ev-list-name,
+    .ev-list-item:hover .ev-list-place,
+    .ev-list-item:hover .ev-list-desc { opacity: .5; transition: opacity .5s ease; }
+    .ev-list-num { font-family: var(--c); font-weight: 800; font-size: 4rem; color: rgba(255,255,255,.12); line-height: 1; margin-bottom: 12px; transition: opacity .5s ease; }
+    .ev-list-name { font-family: var(--c); font-weight: 800; font-size: 1.6rem; text-transform: uppercase; color: var(--white); margin-bottom: 6px; line-height: 1; transition: opacity .5s ease; }
+    .ev-list-place { font-family: var(--c); font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--red); margin-bottom: 16px; transition: opacity .5s ease; }
+    .ev-list-desc { font-size: 13px; font-weight: 300; color: rgba(250,250,250,.55); line-height: 1.75; transition: opacity .5s ease; }
+
+    /* About page dark sticky block */
+    .about-dark-sticky {
+      position: sticky;
+      top: var(--nav-h);
+      z-index: 0;
+      max-height: calc(100vh - var(--nav-h));
+      overflow-y: auto;
+      scrollbar-width: none; /* Firefox */
+    }
+    .about-dark-sticky::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+    /* Engagements */
+    .engagements { background: var(--white); position: relative; z-index: 1; }
+    .engagements-title { padding: 64px 64px 40px; font-family: var(--c); font-weight: 800; font-size: clamp(2rem,4vw,3.2rem); text-transform: uppercase; color: var(--black); }
+    .eng-photos { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    .eng-item { display: flex; flex-direction: column; }
+    .eng-label { padding: 0 48px 14px; font-family: var(--c); font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: rgba(15,15,15,.3); }
+    .eng-photo { height: 908px; background: #1a1a1a; position: relative; overflow: hidden; cursor: pointer; }
+    .eng-photo-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity .6s ease; }
+    .eng-text { position: absolute; inset: 0; background: var(--white); padding: 52px 48px; display: flex; flex-direction: column; justify-content: flex-start; opacity: 0; transition: opacity .6s ease; overflow-y: auto; }
+    .eng-text-title { font-family: var(--c); font-weight: 800; font-size: clamp(2.5rem, 4vw, 4.5rem); text-transform: uppercase; color: var(--red); line-height: .92; margin-bottom: 32px; }
+    .eng-text-body p { font-size: 13px; font-weight: 300; color: var(--red); line-height: 1.85; margin-bottom: 14px; }
+    .eng-photo:hover .eng-photo-bg { opacity: 0; }
+    .eng-photo:hover .eng-text { opacity: 1; }
+
+    /* ══ MANNEQUIN ═════════════════════════════════════════ */
+
+    .model-intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    .model-text { position: relative; padding: 80px 64px; background: var(--white); }
+    .model-text .section-label { position: absolute; top: 52px; left: 64px; margin: 0; }
+    .model-text .section-title { margin-bottom: 24px; font-size: clamp(1.8rem, 3vw, 2.4rem); }
+    .model-text p { font-size: 14px; font-weight: 300; color: #555; line-height: 1.85; margin-bottom: 14px; }
+    .criteria { list-style: none; margin-top: 28px; }
+    .criteria li { display: flex; align-items: flex-start; gap: 14px; padding: 12px 0; border-bottom: 1px solid #E8E5E0; font-size: 13px; color: #444; line-height: 1.5; }
+    .criteria li::before { content: ''; display: block; width: 5px; height: 5px; min-width: 5px; background: var(--red); border-radius: 50%; margin-top: 6px; }
+    .steps-box { background: var(--black); padding: 80px 48px; }
+    .steps-box h3 { font-family: var(--c); font-weight: 800; font-size: clamp(1.8rem, 3vw, 2.4rem); text-transform: uppercase; color: var(--white); margin-bottom: 36px; }
+    .step { display: flex; gap: 20px; margin-bottom: 28px; }
+    .step-num { font-family: var(--c); font-weight: 800; font-size: 2.2rem; color: var(--red); line-height: 1; min-width: 28px; }
+    .step-txt strong { display: block; font-family: var(--c); font-weight: 700; font-size: 1rem; text-transform: uppercase; color: var(--white); letter-spacing: .04em; margin-bottom: 4px; }
+    .step-txt span { font-size: 13px; font-weight: 300; color: rgba(250,250,250,.35); line-height: 1.5; }
+
+    /* Form */
+    .form-sec { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: #F5F3F0; }
+    .form-left { padding: 80px 64px 100px; }
+    .form-sec .section-label { margin-bottom: 6px; }
+    .form-sec .section-title { margin-bottom: 48px; }
+    .form-wrap { max-width: none; }
+    .form-photo { background: #1c1c1c; background-size: cover; background-position: center; min-height: 600px; }
+    .fg { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .ff { grid-column: 1/-1; }
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field label { font-family: var(--c); font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--black); }
+    .field input, .field select, .field textarea { border: 1px solid #DDD9D3; background: transparent; padding: 12px 16px; font-family: var(--s); font-size: 14px; font-weight: 300; color: var(--black); outline: none; transition: border-color .2s; appearance: none; -webkit-appearance: none; }
+    .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px; cursor: pointer; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--red); }
+    .field textarea { resize: vertical; min-height: 110px; }
+    .form-row { margin-top: 32px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+    .form-note { font-size: 12px; font-weight: 300; color: #999; line-height: 1.5; }
+    .form-ok { display: none; text-align: center; padding: 60px 0; }
+    .form-ok .ck { width: 48px; height: 48px; border-radius: 50%; background: var(--red); color: var(--white); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 1.3rem; }
+    .form-ok h3 { font-family: var(--c); font-weight: 800; font-size: 1.8rem; text-transform: uppercase; margin-bottom: 10px; }
+    .form-ok p { font-size: 13px; font-weight: 300; color: #777; }
+
+    /* ══ PARTENAIRE ════════════════════════════════════════ */
+
+    .partner-why { padding: 80px 64px; background: var(--white); display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; align-items: start; }
+    .partner-text .section-title { margin-bottom: 24px; }
+    .partner-text p { font-size: 14px; font-weight: 300; color: #555; line-height: 1.85; margin-bottom: 14px; }
+    .partner-boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+    .pbox { background: var(--black); padding: 28px; }
+    .pbox-n { font-family: var(--c); font-weight: 800; font-size: 2.2rem; color: var(--white); line-height: 1; margin-bottom: 8px; }
+    .pbox-t { font-family: var(--c); font-weight: 700; font-size: .9rem; text-transform: uppercase; color: var(--white); margin-bottom: 8px; letter-spacing: .04em; }
+    .pbox-d { font-size: 12px; font-weight: 300; color: rgba(250,250,250,.35); line-height: 1.6; }
+    .pbox:nth-child(2) { background: #141414; }
+
+    .offers { padding: 80px 64px; background: #F5F3F0; }
+    .offers .section-title { margin-bottom: 48px; }
+    .offers-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; }
+    .offer { background: var(--white); border: 1px solid #E0DDD8; padding: 44px 32px; position: relative; transition: transform .3s, box-shadow .3s; }
+    .offer:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,.06); z-index: 1; }
+    .offer.feat { background: var(--black); border-color: var(--black); }
+    .offer-badge { position: absolute; top: -11px; left: 28px; background: var(--red); color: var(--white); font-family: var(--c); font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; padding: 3px 10px; }
+    .offer-tier { font-family: var(--c); font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--red); margin-bottom: 14px; }
+    .offer-name { font-family: var(--c); font-weight: 800; font-size: 1.7rem; text-transform: uppercase; margin-bottom: 8px; }
+    .offer.feat .offer-name { color: var(--white); }
+    .offer-desc { font-size: 13px; font-weight: 300; color: #888; line-height: 1.65; margin-bottom: 24px; }
+    .offer.feat .offer-desc { color: rgba(250,250,250,.38); }
+    .offer-list { list-style: none; margin-bottom: 32px; }
+    .offer-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; font-size: 13px; color: #555; border-bottom: 1px solid #E8E5E0; }
+    .offer.feat .offer-item { color: rgba(250,250,250,.5); border-color: rgba(255,255,255,.06); }
+    .offer-item::before { content: ''; display: block; width: 5px; height: 5px; min-width: 5px; background: var(--red); border-radius: 50%; margin-top: 5px; }
+
+    /* ── Responsive ─────────────────── */
+    @media (max-width: 1024px) {
+      nav { padding: 0 32px; }
+      .hero-left { padding: 60px 32px; }
+      .who { padding: 60px 32px; }
+      .events-section, .news-section { padding: 0 32px 60px; }
+      .footer-cta { padding: 48px 32px; grid-template-columns: 1fr; }
+      .footer-bottom { padding: 32px; }
+      .page-hero-white { padding: 60px 32px; }
+      .numbers-dark { padding: 60px 32px; }
+      .ev-list { padding: 0 32px 60px; }
+      .form-sec { padding: 60px 32px 80px; }
+      .partner-why, .offers { padding: 60px 32px; }
+      .engagements-title { padding: 48px 32px 32px; }
+      .model-text { padding: 60px 32px; }
+      .steps-box { padding: 48px 32px; }
+    }
+    @media (max-width: 860px) {
+      .nav-links { display: none; }
+      .nav-links.open { display: flex; flex-direction: column; position: fixed; top: var(--nav-h); left: 0; right: 0; background: var(--white); padding: 24px 32px; border-bottom: 1px solid #E0DDD8; gap: 20px; z-index: 99; }
+      .nav-hamburger { display: flex; }
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-right { display: none; }
+      .stats { grid-template-columns: repeat(2,1fr); }
+      .who-grid { grid-template-columns: 1fr; }
+      .ev-grid, .news-grid { grid-template-columns: 1fr; }
+      .ev-side, .news-side { grid-template-rows: auto auto; }
+      .numbers-grid { grid-template-columns: repeat(2,1fr); gap: 40px 0; }
+      .ev-list-grid, .eng-photos { grid-template-columns: 1fr; }
+      .model-intro-grid { grid-template-columns: 1fr; }
+      .partner-why { grid-template-columns: 1fr; }
+      .offers-grid { grid-template-columns: 1fr; }
+      .fg { grid-template-columns: 1fr; }
+      .footer-cta { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-title .w, .hero-eyebrow, .hero-sub, .hero-ctas { animation: none; opacity: 1; transform: none; }
+      .reveal { opacity: 1; transform: none; }
+      #curtain { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="curtain"></div>
+
+<!-- ── Nav ─────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-logo" onclick="go('home')">Talons Aiguilles</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a onclick="go('about')"   data-page="about">L'association</a></li>
+    <li><a onclick="go('model')"   data-page="model">Devenir mannequin</a></li>
+    <li><a onclick="go('partner')" data-page="partner">Devenir partenaire</a></li>
+    <li class="nav-brand-logo"><img src="LOGOS.N.png" alt="Logo" /></li>
+  </ul>
+  <div class="nav-hamburger" id="ham" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     HOME
+══════════════════════════════════════════════ -->
+<div class="page active" id="page-home">
+
+  <section class="hero">
+    <div class="hero-left">
+      <p class="hero-eyebrow">TALONS · ROUBAIX · DEPUIS 1992</p>
+      <h1 class="hero-title">
+        <span class="ww"><span class="w">LA MODE</span></span>
+        <span class="ww"><span class="w">À L'ÉTAT</span></span>
+        <span class="ww"><span class="w red">PUR</span></span>
+      </h1>
+      <p class="hero-sub">Première association étudiante de mode en France.<br>Trois défilés par an, des créateurs du monde entier.<br>34 ans d'histoire à Roubaix.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-red" onclick="go('model')">Devenir mannequin</button>
+        <button class="btn btn-outline-w" onclick="go('partner')">Devenir partenaire</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-img" id="heroImg" style="background-image:url('Photo-hero.jpeg');">
+      </div>
+    </div>
+  </section>
+
+
+  <section class="who">
+    <h2 class="who-title reveal">QUI SOMMES-NOUS ?</h2>
+    <div class="who-grid">
+      <div class="reveal who-left">
+        <p>Talons Aiguilles est une organisation à but non lucratif composée de <span style="color:var(--red)">50 bénévoles</span>, qui organise trois défilés de mode par an dans la région de Lille, depuis 30 ans, mettant en avant de jeunes designers originaires du monde&nbsp;entier.</p>
+        <p>Notre défilé de mode le plus important, le concours international des jeunes créateurs (CJC), a déjà accueilli des jurys renommés tels que <span style="color:var(--red)">Paco Rabanne</span> ou <span style="color:var(--red)">Thierry Mugler</span>, et très récemment la Présidente Europe de <span style="white-space:nowrap">Christian Dior Couture</span>, <span style="color:var(--red)">Marie-Céline Dupuy&nbsp;d'Angeac</span>.</p>
+        <button class="btn btn-red" style="margin-top:28px;" onclick="go('about')">Notre histoire</button>
+      </div>
+      <div class="who-right-photo reveal rd1" style="background-image:url('Photo-quinoussommes.jpg'); background-size:cover; background-position:center;">
+      </div>
+    </div>
+  </section>
+
+  <section class="events-section">
+    <p class="section-label reveal">Événements</p>
+    <h2 class="section-title reveal">Sur le catwalk</h2>
+    <div class="ev-grid">
+      <div class="ev-card ev-card-main reveal" onclick="go('about')">
+        <div class="ev-card-inner" style="background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)), url('Photo-catwalk-CJC.png') center/cover no-repeat;">
+          <div class="ev-label">— Événement phare</div>
+          <div>
+            <div class="ev-name">Concours International<br>Jeunes Créateurs</div>
+            <div class="ev-date">2026 · Chambre de Commerce, Lille</div>
+          </div>
+        </div>
+      </div>
+      <div class="ev-side">
+        <div class="ev-card ev-sm reveal rd1" onclick="go('about')">
+          <div class="ev-card-inner" style="background:linear-gradient(160deg,rgba(19,19,19,.75),rgba(19,19,19,.75)), url('Photo-catwalk-underground.png') center/cover no-repeat;">
+            <div class="ev-label">Streetwear</div>
+            <div><div class="ev-name">Underground</div><div class="ev-date">Westfield Euralille</div></div>
+          </div>
+        </div>
+        <div class="ev-card ev-sm reveal rd2" onclick="go('about')">
+          <div class="ev-card-inner" style="background:linear-gradient(160deg,rgba(14,14,14,.75),rgba(14,14,14,.75)), url('Photo-catwalk-escalator.png') center/cover no-repeat;">
+            <div class="ev-label">Centre commercial</div>
+            <div><div class="ev-name">Escalator</div><div class="ev-date">Lillénium · Novembre</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="news-section">
+    <p class="section-label reveal">Actualités</p>
+    <div class="news-grid">
+      <div class="news-card reveal">
+        <div class="news-card-inner" style="background:linear-gradient(160deg,rgba(13,13,13,.65),rgba(26,26,26,.65)), url('Photo-actu-focus.jpg') center/cover no-repeat;">
+          <div class="news-tag">— Retour sur le CJC</div>
+          <div>
+            <div class="news-title">Nos focus créateurs</div>
+            <div class="news-sub">CJC · Chambre de Commerce</div>
+          </div>
+        </div>
+      </div>
+      <div class="news-side">
+        <div class="news-card news-sm reveal rd1">
+          <div class="news-card-inner" style="background:linear-gradient(160deg,rgba(20,20,20,.7),rgba(20,20,20,.7)), url('Photo-actu-metgala.jpg') center/cover no-repeat;">
+            <div class="news-tag">Mode</div>
+            <div class="news-title">Met Gala 2026</div>
+            <div class="news-sub">Le meilleur et le pire des looks</div>
+          </div>
+        </div>
+        <div class="news-card news-sm reveal rd2">
+          <div class="news-card-inner" style="background:linear-gradient(160deg,rgba(17,17,17,.7),rgba(17,17,17,.7)), url('Photo-actu-NIKE.jpg') center/cover no-repeat;">
+            <div class="news-tag">Sport & Mode</div>
+            <div class="news-title">Nike réinvente la coupe du monde</div>
+            <div class="news-sub">Talons Aiguilles · Tribune mode</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer CTA -->
+  <div class="footer-cta">
+    <img src="LOGOS.B.png" alt="Logo" class="footer-logo reveal" />
+    <div class="footer-cta-text reveal">
+      <h2>REJOINDRE<br>L'AVENTURE</h2>
+      <p>Mannequin ou partenaire. Il y a une place pour vous.</p>
+    </div>
+    <div class="footer-cta-btns reveal rd1">
+      <button class="btn btn-red" onclick="go('model')">Devenir mannequin</button>
+      <button class="btn btn-outline-w" onclick="go('partner')">Devenir partenaire</button>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-brand">
+      <p>Talons Aiguilles</p>
+      <span>Since 1992 · Première association étudiante de mode en France</span>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.instagram.com/talonsaiguillesedhec/" target="_blank">Instagram</a>
+      <a href="https://www.tiktok.com/@talonsaiguillesedhec" target="_blank">TikTok</a>
+      <a href="https://www.linkedin.com/company/talons-aiguilles/" target="_blank">LinkedIn</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     L'ASSOCIATION
+══════════════════════════════════════════════ -->
+<div class="page" id="page-about">
+
+  <div class="about-dark-sticky">
+  <section class="numbers-dark">
+    <p class="sub">L'Association</p>
+    <h2>TALONS AIGUILLES <em>EN CHIFFRES</em></h2>
+    <div class="numbers-grid">
+      <div class="number-item reveal">
+        <div class="number-val cnt" data-v="6">6</div>
+        <div class="number-label">Événements par an</div>
+      </div>
+      <div class="number-item reveal rd1">
+        <div class="number-val cnt" data-v="34">34</div>
+        <div class="number-label">Ans d'expérience</div>
+      </div>
+      <div class="number-item reveal rd2">
+        <div class="number-val cnt" data-v="50">50</div>
+        <div class="number-label">Bénévoles</div>
+      </div>
+      <div class="number-item reveal rd3">
+        <div class="number-val cnt" data-v="4000">4000</div>
+        <div class="number-label">Spectateurs par an</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ev-list">
+    <h2 class="ev-list-title reveal" style="padding-top:64px">NOS ÉVÉNEMENTS</h2>
+    <div class="ev-list-grid">
+      <div class="ev-list-item reveal" style="background-image:url('Photo-EFW.jpg');">
+        <div class="ev-list-num">01</div>
+        <div class="ev-list-name">Fashion Week</div>
+        <div class="ev-list-place">Campus EDHEC · Roubaix</div>
+        <p class="ev-list-desc">Depuis plus de 10 ans, Talons Aiguilles plonge le campus de l'EDHEC dans le monde de la mode. Showroom, créations artisanales, friperies et prestataires bien-être.</p>
+      </div>
+      <div class="ev-list-item reveal rd1" style="background-image:url('Photo-escalator.jpg');">
+        <div class="ev-list-num">02</div>
+        <div class="ev-list-name">Escalator</div>
+        <div class="ev-list-place">Galerie Lillénium · Novembre</div>
+        <p class="ev-list-desc">Les mannequins descendent les escalators du centre dans des tenues Project X Paris et des pièces de seconde main chinées en friperies.</p>
+      </div>
+      <div class="ev-list-item reveal" style="background-image:url('Photo-underground.jpg');">
+        <div class="ev-list-num">03</div>
+        <div class="ev-list-name">Underground</div>
+        <div class="ev-list-place">Parking souterrain · Westfield Euralille</div>
+        <p class="ev-list-desc">Concours international de jeunes créateurs de streetwear. Les inspirations urbaines et le sportswear redéfinissent les indispensables de la mode.</p>
+      </div>
+      <div class="ev-list-item reveal rd1" style="background-image:url('Photo-CJC02.jpg');">
+        <div class="ev-list-num">04</div>
+        <div class="ev-list-name">CJC</div>
+        <div class="ev-list-place">Palais des Beaux-Arts · Chambre de Commerce</div>
+        <p class="ev-list-desc">Fort de ses 34 ans d'existence, le Concours International des Jeunes Créateurs est l'événement phare de Talons Aiguilles. Vingt candidats des meilleures écoles de stylisme du monde.</p>
+      </div>
+    </div>
+  </section>
+  </div><!-- /.about-dark-sticky -->
+
+  <section class="engagements">
+    <h2 class="engagements-title reveal">NOS ENGAGEMENTS</h2>
+    <div class="eng-photos">
+
+      <div class="eng-item">
+        <div class="eng-label">Mode Durable</div>
+        <div class="eng-photo reveal">
+          <div class="eng-photo-bg" style="background-image:url('Photo-mode-durable.png');"></div>
+          <div class="eng-text">
+            <h2 class="eng-text-title">Une mode durable</h2>
+            <div class="eng-text-body">
+              <p>Nous organisons des événements au sein de l'EDHEC pour sensibiliser les étudiants aux alternatives d'une mode plus consciente et responsable.</p>
+              <p>À travers nos concours jeunes créateurs, nous engageons candidats et public dans une démarche circulaire et durable, parce que la mode de demain se construit aujourd'hui.</p>
+              <p>Chaque édition récompense, via un prix RSE, la création alliant le mieux excellence et respect environnemental.</p>
+              <p>En prolongement, l'association organise une journée dédiée à la mode durable : anti fast-fashion, surconsommation, et mise en lumière de prestataires engagés.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="eng-item">
+        <div class="eng-label">Diversité &amp; Inclusion</div>
+        <div class="eng-photo reveal rd1">
+          <div class="eng-photo-bg" style="background-image:url('Photo-diversité.png');"></div>
+          <div class="eng-text">
+            <h2 class="eng-text-title">Diversité</h2>
+            <div class="eng-text-body">
+              <p>Talons Aiguilles met en lumière de jeunes créateurs étudiants, leur offrant une scène pour exprimer leur vision de la mode contemporaine.</p>
+              <p>Nos concours leur permettent de rencontrer des jurés d'exception, acteurs influents du secteur, et d'accéder à des prix concrets : pop-up store, matériel de modélisme, stages et opportunités de réseau.</p>
+              <p>L'association s'engage pour des castings ouverts à tous âges, toutes origines, sans discrimination de genre ni de parcours. Lors d'une édition de l'Escalator, des enfants ont défilé aux côtés d'adultes, incarnant notre vision d'un défilé véritablement inter-générationnel.</p>
+              <p>Depuis 2022, notre partenariat avec le CROUS permet à des étudiants boursiers de toute la Métropole Lilloise d'assister au Concours Jeunes Créateurs. Nos défilés sont un levier d'inclusion.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="footer-cta">
+    <img src="LOGOS.B.png" alt="Logo" class="footer-logo" />
+    <div class="footer-cta-text">
+      <h2>REJOINDRE<br>L'AVENTURE</h2>
+      <p>Mannequin ou partenaire. Il y a une place pour vous.</p>
+    </div>
+    <div class="footer-cta-btns">
+      <button class="btn btn-red" onclick="go('model')">Devenir mannequin</button>
+      <button class="btn btn-outline-w" onclick="go('partner')">Devenir partenaire</button>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-brand"><p>Talons Aiguilles</p><span>Since 1992 · Première association étudiante de mode en France</span></div>
+    <div class="footer-links"><a href="#">Instagram</a><a href="#">TikTok</a><a href="#">LinkedIn</a></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MANNEQUIN
+══════════════════════════════════════════════ -->
+<div class="page" id="page-model">
+
+  <div class="page-hero-white" style="background:var(--black);">
+    <p style="font-family:var(--c);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(250,250,250,.35);margin-bottom:16px;">Casting ouvert</p>
+    <h1 style="color:var(--white);">DEVENIR <span style="color:var(--red);">MANNEQUIN</span></h1>
+  </div>
+
+  <div class="model-intro-grid">
+    <div class="model-text reveal">
+      <p class="section-label">Pourquoi postuler</p>
+      <h2 class="section-title">Défiler avec<br>Talons Aiguilles</h2>
+      <p>Tu rêves de marcher sur un podium, de te dépasser et de vivre l'effervescence d'un défilé ? Talons Aiguilles t'ouvre ses portes. Aucune expérience préalable requise, seulement de la passion.</p>
+      <ul class="criteria">
+        <li>S'engager pour toute la durée de la préparation (3 à 5 semaines)</li>
+        <li>Participer aux répétitions</li>
+        <li>Respecter les valeurs et engagements de l'association</li>
+        <li>Aucune expérience de défilé requise</li>
+      </ul>
+    </div>
+    <div class="steps-box reveal rd1">
+      <h3>Le parcours en <span style="color:var(--red)">3 étapes</span></h3>
+      <ul style="list-style:none;">
+        <li class="step"><span class="step-num">01</span><div class="step-txt"><strong>Candidature en ligne</strong><span>Remplis le formulaire avec tes informations et motivations.</span></div></li>
+        <li class="step"><span class="step-num">02</span><div class="step-txt"><strong>Entretien de casting</strong><span>Notre équipe te recontacte pour un entretien individuel.</span></div></li>
+        <li class="step"><span class="step-num">03</span><div class="step-txt"><strong>Le grand soir</strong><span>Monte sur scène devant un public conquis.</span></div></li>
+      </ul>
+    </div>
+  </div>
+
+  <section class="form-sec">
+    <div class="form-left">
+    <p class="section-label">Candidature</p>
+    <h2 class="section-title">Postule dès maintenant</h2>
+    <div class="form-wrap">
+      <form onsubmit="fOk(event,'mok','mf')">
+        <div id="mok" class="form-ok"><div class="ck">✓</div><h3>Candidature envoyée !</h3><p>Notre équipe te contactera dans les prochains jours.</p></div>
+        <div id="mf">
+          <div class="fg">
+            <div class="field"><label>Prénom *</label><input type="text" required placeholder="Ton prénom"/></div>
+            <div class="field"><label>Nom *</label><input type="text" required placeholder="Ton nom"/></div>
+            <div class="field"><label>Email *</label><input type="email" required placeholder="ton@email.com"/></div>
+            <div class="field"><label>Téléphone</label><input type="tel" placeholder="+33 6 XX XX XX XX"/></div>
+            <div class="field"><label>Année de naissance</label><input type="number" placeholder="Ex : 2002" min="1950" max="2015"/></div>
+            <div class="field"><label>Taille (cm)</label><input type="number" placeholder="170" min="140" max="220"/></div>
+            <div class="field"><label>Expérience défilé</label><select><option value="">— Sélectionner —</option><option>Non, première fois</option><option>Oui, en association</option><option>Oui, professionnellement</option></select></div>
+            <div class="field"><label>Vous nous avez connus via</label><select><option value="">— Sélectionner —</option><option>Instagram</option><option>TikTok</option><option>Bouche à oreille</option><option>Forum des asso</option></select></div>
+            <div class="field ff"><label>Lettre de motivation *</label><textarea required placeholder="Pourquoi souhaites-tu rejoindre Talons Aiguilles ?"></textarea></div>
+            <div class="field ff"><label>Lien photos *</label><input type="url" required placeholder="Instagram, Drive, Portfolio…"/></div>
+          </div>
+          <div class="form-row">
+            <button type="submit" class="btn btn-red">Envoyer ma candidature</button>
+            <p class="form-note">* Champs obligatoires.<br>Données utilisées uniquement pour ce recrutement.</p>
+          </div>
+        </div>
+      </form>
+    </div>
+    </div><!-- /.form-left -->
+    <div class="form-photo" style="background-image:url('Photo-devenir-mannequin.png');"></div>
+  </section>
+
+  <div class="footer-cta">
+    <img src="LOGOS.B.png" alt="Logo" class="footer-logo" />
+    <div class="footer-cta-text">
+      <h2>REJOINDRE<br>L'AVENTURE</h2>
+      <p>Mannequin ou partenaire. Il y a une place pour vous.</p>
+    </div>
+    <div class="footer-cta-btns">
+      <button class="btn btn-red" onclick="go('model')">Devenir mannequin</button>
+      <button class="btn btn-outline-w" onclick="go('partner')">Devenir partenaire</button>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-brand"><p>Talons Aiguilles</p><span>Since 1992 · Première association étudiante de mode en France</span></div>
+    <div class="footer-links"><a href="https://www.instagram.com/talonsaiguillesedhec/" target="_blank">Instagram</a><a href="https://www.tiktok.com/@talonsaiguillesedhec" target="_blank">TikTok</a><a href="https://www.linkedin.com/company/talons-aiguilles/" target="_blank">LinkedIn</a></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PARTENAIRE
+══════════════════════════════════════════════ -->
+<div class="page" id="page-partner">
+
+  <div class="page-hero-white" style="background:var(--black);">
+    <p style="font-family:var(--c);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(250,250,250,.35);margin-bottom:16px;">Collaboration</p>
+    <h1 style="color:var(--white);">DEVENIR <span style="color:var(--red);">PARTENAIRE</span></h1>
+  </div>
+
+  <section class="partner-why">
+    <div class="reveal">
+      <p class="section-label">Pourquoi nous rejoindre</p>
+      <h2 class="section-title">Un partenariat au service de la mode</h2>
+      <p>Talons Aiguilles vous offre une visibilité unique auprès d'une audience qualifiée. Nous privilégions des relations stables et durables, bien au-delà d'un simple sponsoring ponctuel.</p>
+      <p>Vos équipes bénéficient d'un accès privilégié à de futurs profils qualifiés et d'une présence lors de nos événements mode exclusifs.</p>
+      <button class="btn btn-red" style="margin-top:12px" onclick="document.getElementById('pform').scrollIntoView({behavior:'smooth'})">Nous contacter</button>
+    </div>
+    <div class="partner-boxes reveal rd1">
+      <div class="pbox"><div class="pbox-n">01</div><div class="pbox-t">Vitrine exclusive</div><div class="pbox-d">Visibilité auprès d'un public jeune et qualifié.</div></div>
+      <div class="pbox" style="background:#141414;"><div class="pbox-n">02</div><div class="pbox-t">Vivier de talents</div><div class="pbox-d">Accès à de futurs profils qualifiés issus de l'EDHEC.</div></div>
+      <div class="pbox" style="background:#141414;"><div class="pbox-n">03</div><div class="pbox-t">Innovation</div><div class="pbox-d">Laboratoire créatif pour tester produits et concepts.</div></div>
+      <div class="pbox"><div class="pbox-n">04</div><div class="pbox-t">Présence événements</div><div class="pbox-d">Présence VIP lors d'événements mode exclusifs.</div></div>
+    </div>
+  </section>
+
+  <section class="offers">
+    <p class="section-label">Nos offres</p>
+    <h2 class="section-title">Choisissez votre<br>niveau de partenariat</h2>
+    <div class="offers-grid">
+      <div class="offer reveal">
+        <div class="offer-tier">Bronze</div>
+        <h3 class="offer-name">Soutien</h3>
+        <p class="offer-desc">Pour les entreprises souhaitant soutenir la créativité étudiante et gagner en visibilité.</p>
+        <ul class="offer-list">
+          <li class="offer-item">Logo sur les supports de communication</li>
+          <li class="offer-item">Mentions sur les réseaux sociaux</li>
+          <li class="offer-item">2 invitations au défilé</li>
+          <li class="offer-item">Remerciement lors de l'événement</li>
+        </ul>
+        <button class="btn" onclick="document.getElementById('pform').scrollIntoView({behavior:'smooth'})">Nous contacter</button>
+      </div>
+      <div class="offer feat reveal rd1">
+        <div class="offer-badge">Le plus populaire</div>
+        <div class="offer-tier">Or</div>
+        <h3 class="offer-name">Partenaire</h3>
+        <p class="offer-desc">Visibilité étendue et présence renforcée pour une marque qui veut rayonner.</p>
+        <ul class="offer-list">
+          <li class="offer-item">Logo mis en avant sur tous les supports</li>
+          <li class="offer-item">Posts dédiés sur les réseaux sociaux</li>
+          <li class="offer-item">Stand ou espace de marque à l'événement</li>
+          <li class="offer-item">6 invitations VIP au défilé</li>
+          <li class="offer-item">Article dans notre newsletter</li>
+        </ul>
+        <button class="btn btn-red" onclick="document.getElementById('pform').scrollIntoView({behavior:'smooth'})">Nous contacter</button>
+      </div>
+      <div class="offer reveal rd2">
+        <div class="offer-tier">Platine</div>
+        <h3 class="offer-name">Sponsor titre</h3>
+        <p class="offer-desc">Le partenariat maximal : votre marque co-constructeur de l'événement.</p>
+        <ul class="offer-list">
+          <li class="offer-item">Naming exclusif sur l'événement</li>
+          <li class="offer-item">Campagne de communication conjointe</li>
+          <li class="offer-item">Intégration créative au thème du défilé</li>
+          <li class="offer-item">10 invitations VIP + lounge privatif</li>
+          <li class="offer-item">Rapport de visibilité post-événement</li>
+        </ul>
+        <button class="btn" onclick="document.getElementById('pform').scrollIntoView({behavior:'smooth'})">Nous contacter</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="form-sec" id="pform">
+    <div class="form-left">
+      <p class="section-label">Prise de contact</p>
+      <h2 class="section-title">Discutons de<br>votre partenariat</h2>
+      <div class="form-wrap">
+        <form onsubmit="fOk(event,'pok','pf')">
+          <div id="pok" class="form-ok"><div class="ck">✓</div><h3>Message envoyé !</h3><p>Notre équipe partenariats vous contactera dans les 48h.</p></div>
+          <div id="pf">
+            <div class="fg">
+              <div class="field"><label>Entreprise *</label><input type="text" required placeholder="Votre entreprise"/></div>
+              <div class="field"><label>Secteur</label><select><option value="">— Sélectionner —</option><option>Mode & Textile</option><option>Beauté & Cosmétiques</option><option>Luxe & Accessoires</option><option>Finance & Services</option><option>Médias & Communication</option><option>Autre</option></select></div>
+              <div class="field"><label>Contact *</label><input type="text" required placeholder="Prénom Nom"/></div>
+              <div class="field"><label>Fonction</label><input type="text" placeholder="Directeur Marketing…"/></div>
+              <div class="field"><label>Email *</label><input type="email" required placeholder="contact@entreprise.com"/></div>
+              <div class="field"><label>Téléphone</label><input type="tel" placeholder="+33 1 XX XX XX XX"/></div>
+              <div class="field ff"><label>Niveau de partenariat souhaité</label><select><option value="">— Sélectionner —</option><option>Bronze — Soutien</option><option>Or — Partenaire</option><option>Platine — Sponsor titre</option><option>Sur mesure</option></select></div>
+              <div class="field ff"><label>Votre message *</label><textarea required placeholder="Décrivez vos objectifs et comment vous envisagez ce partenariat…"></textarea></div>
+            </div>
+            <div class="form-row">
+              <button type="submit" class="btn btn-red">Envoyer ma demande</button>
+              <p class="form-note">* Champs obligatoires.<br>Réponse sous 48h ouvrées.</p>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div><!-- /.form-left -->
+    <div class="form-photo" style="background-image:url('Photo-devenir-partenaire.png');"></div>
+  </section>
+
+  <div class="footer-cta">
+    <img src="LOGOS.B.png" alt="Logo" class="footer-logo" />
+    <div class="footer-cta-text">
+      <h2>REJOINDRE<br>L'AVENTURE</h2>
+      <p>Mannequin ou partenaire. Il y a une place pour vous.</p>
+    </div>
+    <div class="footer-cta-btns">
+      <button class="btn btn-red" onclick="go('model')">Devenir mannequin</button>
+      <button class="btn btn-outline-w" onclick="go('partner')">Devenir partenaire</button>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-brand"><p>Talons Aiguilles</p><span>Since 1992 · Première association étudiante de mode en France</span></div>
+    <div class="footer-links"><a href="https://www.instagram.com/talonsaiguillesedhec/" target="_blank">Instagram</a><a href="https://www.tiktok.com/@talonsaiguillesedhec" target="_blank">TikTok</a><a href="https://www.linkedin.com/company/talons-aiguilles/" target="_blank">LinkedIn</a></div>
+  </div>
+</div>
+
+<script>
+  /* Navigation */
+  const PAGES = ['home','about','model','partner'];
+  const curtain = document.getElementById('curtain');
+
+  function go(name) {
+    const cur = document.querySelector('.page.active');
+    if(cur && cur.id === 'page-'+name) return;
+    curtain.className = 'down';
+    setTimeout(() => {
+      PAGES.forEach(p => document.getElementById('page-'+p).classList.remove('active'));
+      document.getElementById('page-'+name).classList.add('active');
+      window.scrollTo({top:0,behavior:'instant'});
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.dataset.page===name));
+      initReveal(); initCounters();
+      curtain.className = 'up';
+      document.getElementById('navLinks').classList.remove('open');
+    }, 450);
+    setTimeout(() => { curtain.className = ''; }, 910);
+  }
+
+  function toggleMenu() { document.getElementById('navLinks').classList.toggle('open'); }
+
+  /* Reveal on scroll */
+  let ro;
+  function initReveal() {
+    if(ro) ro.disconnect();
+    ro = new IntersectionObserver(entries => {
+      entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); ro.unobserve(e.target); } });
+    }, {threshold:.08});
+    const pg = document.querySelector('.page.active');
+    if(pg) pg.querySelectorAll('.reveal').forEach(el => { el.classList.remove('visible'); ro.observe(el); });
+  }
+
+  /* Counter animation */
+  let co;
+  function initCounters() {
+    if(co) co.disconnect();
+    co = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if(e.isIntersecting) {
+          const el = e.target, target = parseInt(el.dataset.v);
+          const dur = 1200, t0 = performance.now();
+          (function tick(now){ const p=Math.min((now-t0)/dur,1), ease=1-Math.pow(1-p,3);
+            el.textContent = target>=1000 ? Math.round(target*ease).toLocaleString('fr-FR') : Math.round(target*ease);
+            if(p<1) requestAnimationFrame(tick);
+          })(performance.now());
+          co.unobserve(el);
+        }
+      });
+    }, {threshold:.5});
+    document.querySelectorAll('.cnt[data-v]').forEach(el => co.observe(el));
+  }
+
+  /* Forms */
+  function fOk(e, okId, fId) {
+    e.preventDefault();
+    document.getElementById(fId).style.display='none';
+    document.getElementById(okId).style.display='block';
+  }
+
+  initReveal(); initCounters();
+</script>
+</body>
+</html>
