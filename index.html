@@ -825,15 +825,6 @@
     setTimeout(() => { curtain.className = ''; }, 910);
   }
 
-  /* Restore page from URL hash on load */
-  (function() {
-    const hash = location.hash.replace('#','');
-    if(PAGES.includes(hash)) {
-      PAGES.forEach(p => document.getElementById('page-'+p).classList.remove('active'));
-      document.getElementById('page-'+hash).classList.add('active');
-      document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.dataset.page===hash));
-    }
-  })();
 
   function toggleMenu() { document.getElementById('navLinks').classList.toggle('open'); }
 
@@ -876,6 +867,15 @@
   }
 
   initReveal(); initCounters();
+
+  /* Restore page from URL hash on load */
+  const _hash = location.hash.replace('#','');
+  if(PAGES.includes(_hash)) {
+    PAGES.forEach(p => document.getElementById('page-'+p).classList.remove('active'));
+    document.getElementById('page-'+_hash).classList.add('active');
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.dataset.page===_hash));
+    initReveal(); initCounters();
+  }
 </script>
 </body>
 </html>
