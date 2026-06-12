@@ -233,8 +233,16 @@
     .eng-text { position: absolute; inset: 0; background: var(--white); padding: 52px 48px; display: flex; flex-direction: column; justify-content: flex-start; opacity: 0; transition: opacity .6s ease; overflow-y: auto; }
     .eng-text-title { font-family: var(--c); font-weight: 800; font-size: clamp(2.5rem, 4vw, 4.5rem); text-transform: uppercase; color: var(--red); line-height: .92; margin-bottom: 32px; }
     .eng-text-body p { font-size: 13px; font-weight: 300; color: var(--red); line-height: 1.85; margin-bottom: 14px; }
-    .eng-photo:hover .eng-photo-bg { opacity: 0; }
-    .eng-photo:hover .eng-text { opacity: 1; }
+    .eng-photo:hover .eng-photo-bg,
+    .eng-photo.tapped .eng-photo-bg { opacity: 0; }
+    .eng-photo:hover .eng-text,
+    .eng-photo.tapped .eng-text { opacity: 1; }
+
+    /* Hint tap sur mobile */
+    @media (hover: none) {
+      .eng-photo::after { content: 'Appuyer pour découvrir'; position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; font-family: var(--c); font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: rgba(255,255,255,.5); z-index: 2; transition: opacity .4s; }
+      .eng-photo.tapped::after { opacity: 0; }
+    }
 
     /* ══ MANNEQUIN ═════════════════════════════════════════ */
 
@@ -867,6 +875,11 @@
   }
 
   initReveal(); initCounters();
+
+  /* Tap sur les cartes engagements (mobile) */
+  document.querySelectorAll('.eng-photo').forEach(card => {
+    card.addEventListener('click', () => card.classList.toggle('tapped'));
+  });
 
   /* Restore page from URL hash on load */
   const _hash = location.hash.replace('#','');
