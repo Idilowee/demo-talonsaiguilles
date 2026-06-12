@@ -811,6 +811,7 @@
   function go(name) {
     const cur = document.querySelector('.page.active');
     if(cur && cur.id === 'page-'+name) return;
+    location.hash = name;
     curtain.className = 'down';
     setTimeout(() => {
       PAGES.forEach(p => document.getElementById('page-'+p).classList.remove('active'));
@@ -823,6 +824,16 @@
     }, 450);
     setTimeout(() => { curtain.className = ''; }, 910);
   }
+
+  /* Restore page from URL hash on load */
+  (function() {
+    const hash = location.hash.replace('#','');
+    if(PAGES.includes(hash)) {
+      PAGES.forEach(p => document.getElementById('page-'+p).classList.remove('active'));
+      document.getElementById('page-'+hash).classList.add('active');
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.dataset.page===hash));
+    }
+  })();
 
   function toggleMenu() { document.getElementById('navLinks').classList.toggle('open'); }
 
